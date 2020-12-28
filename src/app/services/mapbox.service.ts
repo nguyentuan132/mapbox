@@ -10,7 +10,7 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 })
 export class MapboxService {
   map: mapboxgl.Map
-  maker;
+  marker;
   constructor(private http: HttpClient) {
     mapboxgl.accessToken = environment.mapbox.accessToken;
     this.getLocation().subscribe(res => {
@@ -28,14 +28,34 @@ export class MapboxService {
           mapboxgl: mapboxgl
         })
       );
-      this.maker = this.createMaker(res);
+      this.marker = this.createMarker(res);
 
-      this.map.on('click', (e) => {
-        console.log('click', e.lngLat);
-        console.log('maker', this.maker.getLngLat());
-        this.getDirection(this.maker.getLngLat(), e.lngLat).subscribe(res => {
-          console.log(res);
-        });
+      this.map.on('mousedown', (e) => {
+        console.log('===click', e.originalEvent.button);
+        // console.log('click', e.lngLat);
+        // console.log('maker', this.maker.getLngLat());
+        switch (e.originalEvent.button) {
+          case 0: this.getDirection(this.marker.getLngLat(), e.lngLat).subscribe(res => {
+            console.log(res);
+            let coords = res.routes[0].geometry;
+            console.log("coords", JSON.stringify(coords));
+            let distance = res.routes[0].distance; // m
+            let duration = res.routes[0].duration; // seconds
+            console.log("distance", distance);
+            console.log("duration", duration);
+            this.drawRoute(coords);
+          });
+            break;
+          case 2:
+            this.marker.setLngLat([e.lngLat.lng, e.lngLat.lat]);
+            if (this.map.getLayer('route')) {
+              this.map.removeLayer('route');
+              this.map.removeSource('route');
+            }
+            break;
+        }
+
+
       });
     });
   }
@@ -60,7 +80,7 @@ export class MapboxService {
     });
   }
 
-  private createMaker(pos) {
+  private createMarker(pos) {
     let makerElement = document.createElement('i');
     makerElement.className = 'marker material-icons';
     makerElement.style.color = 'blue';
@@ -69,7 +89,7 @@ export class MapboxService {
     makerElement.appendChild(icon);
 
     let popup = new mapboxgl.Popup({ closeButton: false, anchor: 'top-left' })
-      .setHTML('<h3>Drag to chosen your location</h3>')
+      .setHTML('<h3>Right to choose your location</h3>')
       .addTo(this.map);
     makerElement.addEventListener("mouseenter", (event) => {
       popup.setLngLat([marker.getLngLat().lng, marker.getLngLat().lat])
@@ -84,19 +104,46 @@ export class MapboxService {
       .setLngLat(pos)
       .addTo(this.map);
 
-    this.map.on("moveend", (e) => {
-      console.log(e);
-      marker.setLngLat([this.map.getCenter().lng, this.map.getCenter().lat]);
-    });
     return marker;
   }
 
 
-  getDirection(dapart, arrive) {
+  public getDirection(dapart, arrive): Observable<any> {
     let d = `${dapart.lng},${dapart.lat}`
     let a = `${arrive.lng},${arrive.lat}`
     let url = `https://api.mapbox.com/directions/v5/mapbox/walking/${d};${a}?alternatives=true&geometries=geojson&steps=true&access_token=${environment.mapbox.accessToken}`
     return this.http.get(url);
   }
 
+  private drawRoute(coords) {
+    let dataSource = {
+      "type": "Feature",
+      "properties": {},
+      "geometry": coords
+
+    }
+    if (this.map.getLayer('route')) {
+      this.map.getSource('route').setData(dataSource)
+    } else {
+      this.map.addLayer({
+        "id": "route",
+        "type": "line",
+        "source": {
+          "type": "geojson",
+          "data": dataSource
+        },
+        "layout": {
+          "line-join": "round",
+          "line-cap": "round"
+        },
+        "paint": {
+          "line-color": "#3b9ddd",
+          "line-width": 8,
+          "line-opacity": 0.8
+        }
+      });
+    };
+  }
 }
+
+

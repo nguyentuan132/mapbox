@@ -1,0 +1,28 @@
+<table>
+    <tr>
+        <td>
+            Distance
+        </td>
+        <td>
+            {{round(data.routes[0].distance/1000)}} km
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Duration
+        </td>
+        <td>
+            {{round(data.routes[0].duration/60)}} minites
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            <section>
+                <div class="button-row">
+                    <button mat-raised-button color="primary">Book</button>
+                    <button mat-raised-button color="accent" (click)="onCancelClick()">Cancel</button>
+                </div>
+            </section>
+        </td>
+    </tr>
+</table>

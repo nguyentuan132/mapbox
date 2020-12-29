@@ -4,3 +4,56 @@
     bottom: 0;
     width: 100%;
 }
+
+
+.mapboxgl-popup {
+    max-width: 400px;
+    border-radius: 50%;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+    // font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+}
+
+button-container {
+    display: flex;
+    justify-content: center;
+    width: 120px;
+}
+
+section {
+    display: table;
+}
+
+label {
+    display: table-cell;
+    font-size: 14px;
+    margin-left: 8px;
+    min-width: 120px;
+}
+
+.flex-container {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.button-row {
+    display: table-cell;
+    width: 490px;
+}
+
+.button-row .mat-button-base {
+    margin: 8px 8px 8px 0;
+}
+
+
+
+.trip {
+    position: absolute;
+    background: #fff;
+    padding: 10px;
+    font-family: 'Open Sans', sans-serif;
+    left: 5px;
+    top: 30%;
+    border-radius: 20px;
+    background-color: rgba(129, 122, 158, 0.2);
+}

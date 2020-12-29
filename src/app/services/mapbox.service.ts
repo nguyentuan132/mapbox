@@ -4,6 +4,7 @@ import * as MapboxGeocoder from 'mapbox-gl-geocoder';
 import * as mapboxgl from 'mapbox-gl';
 import { Observable } from 'rxjs';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -11,6 +12,9 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 export class MapboxService {
   map: mapboxgl.Map
   marker;
+  private localSource = new BehaviorSubject<object>(undefined);
+  currentLocalSource = this.localSource.asObservable();
+
   constructor(private http: HttpClient) {
     mapboxgl.accessToken = environment.mapbox.accessToken;
     this.getLocation().subscribe(res => {
@@ -44,6 +48,7 @@ export class MapboxService {
             console.log("distance", distance);
             console.log("duration", duration);
             this.drawRoute(coords);
+            this.localSource.next(res);
           });
             break;
           case 2:
@@ -54,8 +59,6 @@ export class MapboxService {
             }
             break;
         }
-
-
       });
     });
   }
@@ -89,7 +92,7 @@ export class MapboxService {
     makerElement.appendChild(icon);
 
     let popup = new mapboxgl.Popup({ closeButton: false, anchor: 'top-left' })
-      .setHTML('<h3>Right to choose your location</h3>')
+      .setHTML('<h3>Right click to choose your location</h3>')
       .addTo(this.map);
     makerElement.addEventListener("mouseenter", (event) => {
       popup.setLngLat([marker.getLngLat().lng, marker.getLngLat().lat])

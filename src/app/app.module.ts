@@ -8,13 +8,15 @@ import { AppMaterialModule } from './modules/app-material.module';
 
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { PopupComponent } from './components/popup/popup.component';
+import { PopupComponent, DialogContent } from './components/popup/popup.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    PopupComponent
+    PopupComponent,
+    DialogContent
   ],
+  entryComponents: [DialogContent],
   imports: [
     CommonModule,
     BrowserModule,
